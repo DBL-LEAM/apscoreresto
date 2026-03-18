@@ -2,7 +2,8 @@
 
 include_once "bd.utilisateur.inc.php";
 
-function login($mailU, $mdpU) {
+function login($mailU, $mdpU)
+{
     if (!isset($_SESSION)) {
         session_start();
     }
@@ -15,6 +16,7 @@ function login($mailU, $mdpU) {
         if (password_verify($mdpU, $hashBD)) {
             $_SESSION["mailU"] = $mailU;
             $_SESSION["mdpU"] = $hashBD;
+            $_SESSION["role"] = $util["role"];
             return true;
         }
     }
@@ -22,26 +24,28 @@ function login($mailU, $mdpU) {
     return false;
 }
 
-function logout() {
+function logout()
+{
     if (!isset($_SESSION)) {
         session_start();
     }
     unset($_SESSION["mailU"]);
     unset($_SESSION["mdpU"]);
+    unset($_SESSION["role"]);
 }
 
-function getMailULoggedOn(){
-    if (isLoggedOn()){
+function getMailULoggedOn()
+{
+    if (isLoggedOn()) {
         $ret = $_SESSION["mailU"];
-    }
-    else {
+    } else {
         $ret = "";
     }
     return $ret;
-        
 }
 
-function isLoggedOn() {
+function isLoggedOn()
+{
     if (!isset($_SESSION)) {
         session_start();
     }
@@ -49,7 +53,8 @@ function isLoggedOn() {
 
     if (isset($_SESSION["mailU"])) {
         $util = getUtilisateurByMailU($_SESSION["mailU"]);
-        if ($util["mailU"] == $_SESSION["mailU"] && $util["mdpU"] == $_SESSION["mdpU"]
+        if (
+            $util["mailU"] == $_SESSION["mailU"] && $util["mdpU"] == $_SESSION["mdpU"]
         ) {
             $ret = true;
         }
@@ -73,4 +78,3 @@ if ($_SERVER["SCRIPT_FILENAME"] == __FILE__) {
     // deconnexion
     logout();
 }
-?>

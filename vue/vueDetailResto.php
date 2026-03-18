@@ -77,7 +77,19 @@
 <h2 id="horaires">
     Horaires
 </h2>
-<?= $unResto['horairesR']; ?>
+<div class="horaires">
+    <?php
+    if (!empty($unResto['horairesR'])) {
+        // Convertir les sauts de ligne en <br> et afficher
+        $horaires = $unResto['horairesR'];
+        // Remplacer les retours à la ligne par des <br>
+        $horaires = str_replace(array("\r\n", "\r", "\n"), "<br>", $horaires);
+        echo $horaires;
+    } else {
+        echo "Horaires non disponibles";
+    }
+    ?>
+</div>
 
 
 <h2 id="crit">Critiques</h2>
@@ -108,7 +120,23 @@
 </ul>
 <form name="formCritique" method="post" action="./?action=critiques&idR=<?= $unResto['idR']; ?>">
     <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 12px; margin-left: 5px;">
-        <textarea name="critique" placeholder="Votre critique" rows="4" style="width:895px;"></textarea>
+        <textarea name="critique" id="critiqueTextarea" placeholder="Votre critique" rows="4" style="width:895px;" maxlength="160"></textarea>
+        <div style="font-size: 12px; color: #666;">
+            <span id="charCount">0</span> / 160 caractères
+        </div>
         <button style="" id="validerNote" data-idR="<?= $unResto['idR']; ?>">Envoyer</button>
     </div>
 </form>
+
+<script>
+    const critiqueTextarea = document.getElementById('critiqueTextarea');
+    const charCount = document.getElementById('charCount');
+
+    // Initialiser le compteur au chargement
+    charCount.textContent = critiqueTextarea.value.length;
+
+    // Mettre à jour le compteur à chaque saisie
+    critiqueTextarea.addEventListener('input', function() {
+        charCount.textContent = this.value.length;
+    });
+</script>

@@ -1,11 +1,11 @@
-
-<h1>Liste des restaurants</h1>
+<h1>Top 4 des restaurants</h1>
 
 <?php
 for ($i = 0; $i < count($listeRestos); $i++) {
 
     $lesPhotos = getPhotosByIdR($listeRestos[$i]['idR']);
-    ?>
+    $noteMoyenne = $listeRestos[$i]['noteMoyenne'];
+?>
 
     <div class="card">
         <div class="photoCard">
@@ -22,9 +22,15 @@ for ($i = 0; $i < count($listeRestos); $i++) {
             <br />
             <?= $listeRestos[$i]["cpR"] ?>
             <?= $listeRestos[$i]["villeR"] ?>
+            <br />
+            <?php if ($noteMoyenne !== null) { ?>
+                Note moyenne : <?= number_format($noteMoyenne, 2) ?>/5
+            <?php } else { ?>
+                Pas encore de notes
+            <?php } ?>
         </div>
         <div class="tagCard">
-            <ul id="tagFood">		
+            <ul id="tagFood">
 
 
             </ul>
@@ -38,8 +44,6 @@ for ($i = 0; $i < count($listeRestos); $i++) {
 
 
 
-    <?php
+<?php
 }
 ?>
-
-

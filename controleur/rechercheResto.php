@@ -1,6 +1,6 @@
 <?php
-if ( $_SERVER["SCRIPT_FILENAME"] == __FILE__ ){
-    $racine="..";
+if ($_SERVER["SCRIPT_FILENAME"] == __FILE__) {
+    $racine = "..";
 }
 include_once "$racine/modele/bd.resto.inc.php";
 include_once "$racine/modele/bd.typecuisine.inc.php";
@@ -8,9 +8,10 @@ include_once "$racine/modele/bd.photo.inc.php";
 
 // creation du menu burger
 $menuBurger = array();
-$menuBurger[] = Array("url"=>"./?action=recherche&critere=nom","label"=>"Recherche par nom");
-$menuBurger[] = Array("url"=>"./?action=recherche&critere=adresse","label"=>"Recherche avec adresse");
-$menuBurger[] = Array("url"=>"./?action=recherche&critere=typeCuisine","label"=>"Recherche par type de cuisine");
+$menuBurger[] = array("url" => "./?action=recherche&critere=nom", "label" => "Recherche par nom");
+$menuBurger[] = array("url" => "./?action=recherche&critere=adresse", "label" => "Recherche avec adresse");
+$menuBurger[] = array("url" => "./?action=recherche&critere=typeCuisine", "label" => "Recherche par type de cuisine");
+$menuBurger[] = array("url" => "./?action=recherche&critere=multicriteres", "label" => "Recherche multicritères");
 $listtypecui = getTypesCuisine();
 // critere de recherche par defaut
 $critere = "nom";
@@ -19,35 +20,35 @@ if (isset($_GET["critere"])) {
 }
 
 // recuperation des donnees GET, POST, et SESSION
-if (isset($_GET["critere"])){
+if (isset($_GET["critere"])) {
     $critere = $_GET["critere"];
 }
-$nomR="";
-if (isset($_POST["nomR"])){
+$nomR = "";
+if (isset($_POST["nomR"])) {
     $nomR = $_POST["nomR"];
 }
-$voieAdrR="";
-if (isset($_POST["voieAdrR"])){
+$voieAdrR = "";
+if (isset($_POST["voieAdrR"])) {
     $voieAdrR = $_POST["voieAdrR"];
 }
-$cpR="";
-if (isset($_POST["cpR"])){
+$cpR = "";
+if (isset($_POST["cpR"])) {
     $cpR = $_POST["cpR"];
 }
-$villeR="";
-if (isset($_POST["villeR"])){
+$villeR = "";
+if (isset($_POST["villeR"])) {
     $villeR = $_POST["villeR"];
 }
 $tabIdTC = array();
-if(isset($_POST["tabIdTC"])){
+if (isset($_POST["tabIdTC"])) {
     $tabIdTC = $_POST["tabIdTC"];
 }
 
 
 // appel des fonctions permettant de recuperer les donnees utiles a l'affichage 
+$listeRestos = array();
 
-
-switch($critere){
+switch ($critere) {
     case 'nom':
         // recherche par nom
         $listeRestos = getRestosByNomR($nomR);
@@ -60,10 +61,16 @@ switch($critere){
         // recherche par type de cuisine
         $listeRestos = getRestosByTypeCuisine($tabIdTC);
         break;
+    case 'multicriteres':
+        // recherche multicritères (adresse ET type de cuisine)
+        if (!empty($tabIdTC)) {
+            $listeRestos = getRestosMulticriteres($voieAdrR, $cpR, $villeR, $tabIdTC);
+        }
+        break;
 }
 
 
-// traitement si necessaire des donnees recuperees
+    // traitement si necessaire des donnees recuperees
 ;
 
 // appel du script de vue qui permet de gerer l'affichage des donnees
@@ -75,6 +82,3 @@ if (!empty($_POST)) {
     include "$racine/vue/vueResultRecherche.php";
 }
 include "$racine/vue/pied.html.php";
-
-
-?>

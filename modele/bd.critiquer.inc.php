@@ -8,7 +8,7 @@ function getCritiquerByIdR($idR)
 
     try {
         $cnx = connexionPDO();
-        $req = $cnx->prepare("select * from critiquer where idR=:idR");
+        $req = $cnx->prepare("select * from critiquer where idR=:idR AND statut = 'autorise'");
         $req->bindValue(':idR', $idR, PDO::PARAM_INT);
 
         $req->execute();
@@ -26,7 +26,7 @@ function getNoteMoyenneByIdR($idR)
 
     try {
         $cnx = connexionPDO();
-        $req = $cnx->prepare("select avg(note) from critiquer where idR=:idR");
+        $req = $cnx->prepare("select avg(note) from critiquer where idR=:idR AND statut = 'autorise'");
         $req->bindValue(':idR', $idR, PDO::PARAM_INT);
 
         $req->execute();
@@ -48,7 +48,7 @@ function getNoteByUser($idR, $mailU)
 
     try {
         $cnx = connexionPDO();
-        $req = $cnx->prepare("SELECT note FROM critiquer WHERE idR=:idR AND mailU=:mailU");
+        $req = $cnx->prepare("SELECT note FROM critiquer WHERE idR=:idR AND mailU=:mailU AND statut = 'autorise'");
         $req->bindValue(':idR', $idR, PDO::PARAM_INT);
         $req->bindValue(':mailU', $mailU, PDO::PARAM_STR);
 
@@ -73,8 +73,8 @@ function addOrUpdateCritique($idR, $mailU, $note = null, $commentaire = null)
         $cnx = connexionPDO();
         // si l'utilisateur a déjà une critique on la met à jour  sinon on insère
         $req = $cnx->prepare("
-            INSERT INTO critiquer (idR, mailU, note, commentaire)
-            VALUES (:idR,:mailU,:note,:commentaire)
+            INSERT INTO critiquer (idR, mailU, note, commentaire, statut)
+            VALUES (:idR,:mailU,:note,:commentaire, 'en attente')
             ON DUPLICATE KEY UPDATE
             note = if(:note IS NOT NULL,:note, note),
             commentaire = if(:commentaire IS NOT NULL, :commentaire, commentaire)
@@ -104,7 +104,48 @@ function deleteCritiqueByUser($idR, $mailU)
     }
 }
 
+function getCritiquesEnAttente()
+{
+    $resultat = array();
 
+    try {
+        $cnx = connexionPDO();
+        $req = $cnx->prepare("select * from critiquer where statut = 'en attente' order by idR");
+        $req->execute();
+
+        $resultat = $req->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        print "Erreur !: " . $e->getMessage();
+        die();
+    }
+    return $resultat;
+}
+
+function autoriserCritique($idR, $mailU)
+{
+    try {
+        $cnx = connexionPDO();
+        $req = $cnx->prepare("UPDATE critiquer SET statut = 'autorise' WHERE idR = :idR AND mailU = :mailU");
+        $req->bindValue(':idR', $idR, PDO::PARAM_INT);
+        $req->bindValue(':mailU', $mailU, PDO::PARAM_STR);
+        return $req->execute();
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+function declinerCritique($idR, $mailU)
+{
+    try {
+        $cnx = connexionPDO();
+        $req = $cnx->prepare("DELETE FROM critiquer WHERE idR = :idR AND mailU = :mailU");
+        $req->bindValue(':idR', $idR, PDO::PARAM_INT);
+        $req->bindValue(':mailU', $mailU, PDO::PARAM_STR);
+        return $req->execute();
+    } catch (PDOException $e) {
+        return false;
+    }
+}
 
 if ($_SERVER["SCRIPT_FILENAME"] == __FILE__) {
     // prog principal de test

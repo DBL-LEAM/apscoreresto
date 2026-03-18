@@ -1,6 +1,7 @@
 <?php
 
-function controleurPrincipal($action) {
+function controleurPrincipal($action)
+{
     $lesActions = array();
     $lesActions["defaut"] = "listeRestos.php";
     $lesActions["liste"] = "listeRestos.php";
@@ -16,16 +17,17 @@ function controleurPrincipal($action) {
     $lesActions["critiques"] = "critiques.php";
     $lesActions["delCritique"] = "delCritique.php";
     $lesActions["noter"] = "note.php";
-// echo '<pre>';
-// print_r($lesActions);
-// echo '</pre>';
+    $lesActions["ajouterResto"] = "ajouterResto.php";
+    $lesActions["gererCritiques"] = "gererCritiques.php";
+    $lesActions["autoriserCritique"] = "autoriserCritique.php";
+    $lesActions["declinerCritique"] = "declinerCritique.php";
+    // echo '<pre>';
+    // print_r($lesActions);
+    // echo '</pre>';
 
     if (array_key_exists($action, $lesActions)) {
         return $lesActions[$action];
-    } 
-    else {
+    } else {
         return $lesActions["defaut"];
     }
 }
-
-?>
